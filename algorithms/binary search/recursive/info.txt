@@ -1,1 +1,4 @@
+an array is randomized then sorted (binary search works on sorted arrays) and tested.
+
+the binarySearch function takes in 1.array pointer 2.starting index 3.ending index 4.key which is to be found
 
