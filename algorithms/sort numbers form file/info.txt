@@ -1,0 +1,5 @@
+randomize text file with 1 million numbers (in range 1-1000)
+
+sorted them by frequency distribution in array
+
+program will take a while before prompting
