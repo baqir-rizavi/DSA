@@ -1,0 +1,1 @@
+make an array with user specified dimensions also (optional) specify starting index of each dimension 
