@@ -1,1 +1,1 @@
-make an array with user specified dimensions also (optional) specify starting index of each dimension 
+make an array of any dimension dynamically (optional: starting index can be specified)
