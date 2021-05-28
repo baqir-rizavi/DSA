@@ -1,0 +1,267 @@
+#include <iostream>
+using namespace std;
+
+template <typename T>
+struct BTNode
+{
+	T info;
+	BTNode<T>* left;
+	BTNode<T>* right;
+	BTNode()
+	{
+		right = left = nullptr;
+	}
+	BTNode(T value)
+	{
+		info = value;
+		right = left = nullptr;
+	}
+};
+
+template<typename T>
+class LinkBinaryTree
+{
+private:
+	BTNode<T>* root;
+	void parenthesizeViewToTree(BTNode<T>*& nodePtr, const char* str);
+	void printExplorerView(BTNode<T>*, int);
+	void remove(BTNode<T>* ptr);
+	void VLR(BTNode<T>*);
+	BTNode<T>* search(T, BTNode<T>*);
+	int isBTIsomorphic(BTNode<T>* lhs, BTNode<T>* rhs);
+public:
+	LinkBinaryTree();
+	~LinkBinaryTree();
+	void setRoot(T);
+	void setLeftSide(T, T);
+	void setRightSide(T, T);
+	void preOrder();
+	bool isSubtree(LinkBinaryTree<T>& tree);
+	void printExplorerView();
+	void parenthesizeViewToTree(string parenthisizeExpression);
+};
+
+template<typename T>
+void LinkBinaryTree<T>::parenthesizeViewToTree(BTNode<T>*& nodePtr, const char* str)
+{
+	if (*str == ')')
+		return;
+	if (*str != '(' && *str != ',')
+		nodePtr = new BTNode<T>(*str);
+	if (*(str + 1) == '(' && *(str + 2) == ',')
+		parenthesizeViewToTree(nodePtr->right, str + 3);
+	if (*(str + 1) == '(')
+		parenthesizeViewToTree(nodePtr->left, str + 2);
+	if (*(str + 1) == ',')
+		parenthesizeViewToTree(nodePtr->right, str + 2);
+}
+
+template<typename T>
+void LinkBinaryTree<T>::printExplorerView(BTNode<T>* ptr, int count)
+{
+	if (!ptr)
+	{
+		return;
+	}
+
+	for (int i = 0; i < count; i++)
+		cout << '\t';
+	cout << ptr->info << '\n';
+
+	printExplorerView(ptr->left, count + 1);
+	printExplorerView(ptr->right, count + 1);
+}
+
+template<typename T>
+void LinkBinaryTree<T>::remove(BTNode<T>* ptr)
+{
+	if (!ptr)
+	{
+		return;
+	}
+	remove(ptr->left);
+	remove(ptr->right);
+	delete ptr;
+}
+
+template<typename T>
+void LinkBinaryTree<T>::VLR(BTNode<T>* ptr)
+{
+	if (!ptr)
+	{
+		return;
+	}
+	cout << ptr->info;
+	VLR(ptr->left);
+	VLR(ptr->right);
+}
+
+template<typename T>
+BTNode<T>* LinkBinaryTree<T>::search(T key, BTNode<T>* nodePtr)
+{
+	if (!nodePtr)
+	{
+		return nullptr;
+	}
+	if (nodePtr->info == key)
+	{
+		return nodePtr;
+	}
+	BTNode<T>* ref = search(key, nodePtr->left);
+	if (!ref)
+	{
+		ref = search(key, nodePtr->right);
+	}
+	return ref;
+
+}
+
+template<typename T>
+int LinkBinaryTree<T>::isBTIsomorphic(BTNode<T>* lhs, BTNode<T>* rhs)
+{
+	if (!lhs && !rhs)
+	{
+		return true;
+	}
+	if (!lhs != !rhs)
+	{
+		return false;
+	}
+	if (lhs->info != rhs->info)
+	{
+		return false;
+	}
+	int x = isBTIsomorphic(lhs->left, rhs->left);
+	if (x)
+	{
+		return isBTIsomorphic(lhs->right, rhs->right);
+	}
+	else return false;
+}
+
+template<typename T>
+LinkBinaryTree<T>::LinkBinaryTree() : root(nullptr)
+{}
+
+template<typename T>
+LinkBinaryTree<T>::~LinkBinaryTree()
+{
+	if (root)
+	{
+		remove(root);
+		root = nullptr;
+	}
+}
+
+template<typename T>
+void LinkBinaryTree<T>::setRoot(T value)
+{
+	if (root)
+	{
+		root->info = value;
+		return;
+	}
+	root = new BTNode<T>(value);
+}
+
+template<typename T>
+void LinkBinaryTree<T>::setLeftSide(T par, T ch)
+{
+	BTNode<T>* ptr = search(par, root);
+	if (ptr)
+	{
+		if (ptr->left)
+		{
+			ptr->left->info = ch;
+		}
+		else
+		{
+			ptr->left = new BTNode<T>(ch);
+		}
+	}
+}
+
+template<typename T>
+void LinkBinaryTree<T>::setRightSide(T par, T ch)
+{
+	BTNode<T>* ptr = search(par, root);
+	if (ptr)
+	{
+		if (ptr->right)
+		{
+			ptr->right->info = ch;
+		}
+		else
+		{
+			ptr->right = new BTNode<T>(ch);
+		}
+	}
+}
+
+template<typename T>
+void LinkBinaryTree<T>::preOrder()
+{
+	VLR(root);
+}
+
+template<typename T>
+bool LinkBinaryTree<T>::isSubtree(LinkBinaryTree<T>& tree)
+{
+	BTNode<T>* thisPtr = search(tree.root->info, this->root);
+	if (!thisPtr)
+		return false;
+	else
+		return isBTIsomorphic(thisPtr, tree.root);
+}
+
+template<typename T>
+void LinkBinaryTree<T>::printExplorerView()
+{
+	printExplorerView(root, 0);
+}
+
+template<typename T>
+void LinkBinaryTree<T>::parenthesizeViewToTree(string parenthisizeExpression)
+{
+	this->~LinkBinaryTree();
+	parenthesizeViewToTree(root, parenthisizeExpression.c_str());
+}
+
+int main()
+{
+	LinkBinaryTree<char> tree;
+	tree.setRoot('A');
+	tree.setLeftSide('A', 'B');
+	tree.setRightSide('A', 'C');
+	tree.setLeftSide('B', 'D');
+	tree.setRightSide('B', 'E');
+	tree.setRightSide('D', 'H');
+	tree.setLeftSide('E', 'I');
+	tree.setRightSide('E', 'J');
+	tree.setLeftSide('I', 'K');
+	tree.setRightSide('C', 'F');
+
+	LinkBinaryTree<char> tree2;
+	tree2.setRoot('E');
+	tree2.setLeftSide('E', 'I');
+	tree2.setRightSide('E', 'J');
+	tree2.setLeftSide('I', 'K');
+
+	LinkBinaryTree<char> tree3;
+	tree3.setRoot('E');
+	tree3.setRightSide('E', 'I');
+	tree3.setLeftSide('E', 'J');
+	tree3.setRightSide('I', 'K');
+
+	cout << tree.isSubtree(tree2);
+	cout << tree.isSubtree(tree3);
+
+	cout << '\n';
+	tree.printExplorerView();
+	cout << '\n';
+
+	tree3.parenthesizeViewToTree("A(B(D(,H),E(I(K,),J)),C(,F))");
+	tree3.preOrder();
+
+
+}
