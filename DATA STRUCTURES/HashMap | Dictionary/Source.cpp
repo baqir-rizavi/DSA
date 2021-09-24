@@ -1,7 +1,7 @@
 #include <iostream>
 #include <functional>	// for hash and pair class
 #include <forward_list>	// can use custom made
-#include <algorithm>	// for iterating functions example. "find/find_if/remove_if/copy/for_each"
+#include <algorithm>	// for iterating functions example. "find/find_if/remove_if/copy"
 using namespace std;
 
 /*
@@ -20,7 +20,7 @@ private:
 	int objectCount = 0;
 	forward_list<pair<KEY, VALUE>>* data;
 	//==============================
-	int getHashValue(KEY key) const;
+	int getHashValue(const KEY& key) const;
 	void resize();
 	//==============================
 public:
@@ -29,9 +29,10 @@ public:
 	HashMap(const HashMap& map);
 	HashMap& operator=(const HashMap& map);
 	void add(const KEY& key, const VALUE& val);
-	VALUE& get(KEY key);
-	void remove(KEY key);
-	bool isPresent(KEY Key);
+	const VALUE& get(const KEY& key) const;
+	VALUE& get(const KEY& key);
+	void remove(const KEY& key);
+	bool isPresent(const KEY& Key) const;
 	bool isEmpty() const;
 	int getCount() const;
 	~HashMap();
@@ -40,14 +41,13 @@ public:
 int main()
 {
 	HashMap<int, string> h(20);
-	h.add(4, "hi");
-	cout << h.get(4);
+	
 }
 
 #pragma region  implementation_of_HashMap_functions
 
 template<typename KEY, typename VALUE>
-int HashMap<KEY, VALUE>::getHashValue(KEY key) const
+int HashMap<KEY, VALUE>::getHashValue(const KEY& key) const
 {
 	hash<KEY> h;
 	return h(key) % size;
@@ -115,14 +115,16 @@ void HashMap<KEY, VALUE>::add(const KEY& key, const VALUE& val)
 		return;
 	data[getHashValue(key)].push_front(pair<KEY, VALUE>(key, val));
 	objectCount++;
+	//cout << getHashValue(key) << endl;
 	resize();
 }
 
 template<typename KEY, typename VALUE>
-VALUE& HashMap<KEY, VALUE>::get(KEY key)
+VALUE& HashMap<KEY, VALUE>::get(const KEY& key)
 {
 	typename forward_list<pair<KEY, VALUE>>::iterator it;
-	it = find_if(data[getHashValue(key)].begin(), data[getHashValue(key)].end(), [&](pair<KEY, VALUE> p) {return p.first == key; });
+	it = find_if(data[getHashValue(key)].begin(), data[getHashValue(key)].end(), [&](const pair<KEY, VALUE>& p) {return p.first == key; });
+	//cout << getHashValue(key) << endl;
 	
 	if (it != data[getHashValue(key)].end())
 		return it->second;
@@ -133,16 +135,31 @@ VALUE& HashMap<KEY, VALUE>::get(KEY key)
 }
 
 template<typename KEY, typename VALUE>
-void HashMap<KEY, VALUE>::remove(KEY key)
+const VALUE& HashMap<KEY, VALUE>::get(const KEY& key) const
 {
-	data[getHashValue(key)].remove_if([&](pair<KEY, VALUE> p) {return p.first == key; });
+	typename forward_list<pair<KEY, VALUE>>::iterator it;
+	it = find_if(data[getHashValue(key)].begin(), data[getHashValue(key)].end(), [&](const pair<KEY, VALUE>& p) {return p.first == key; });
+	//cout << getHashValue(key) << endl;
+
+	if (it != data[getHashValue(key)].end())
+		return it->second;
+	else
+		exit(0);
+
+	// TODO: throw exception
+}
+
+template<typename KEY, typename VALUE>
+void HashMap<KEY, VALUE>::remove(const KEY& key)
+{
+	data[getHashValue(key)].remove_if([&](const pair<KEY, VALUE>& p) {return p.first == key; });
 	objectCount--;
 }
 
 template<typename KEY, typename VALUE>
-bool HashMap<KEY, VALUE>::isPresent(KEY key)
+bool HashMap<KEY, VALUE>::isPresent(const KEY& key) const
 {
-	return (find_if(data[getHashValue(key)].begin(), data[getHashValue(key)].end(), [&](pair<KEY, VALUE> p) {return p.first == key; }) != data[getHashValue(key)].end());
+	return (find_if(data[getHashValue(key)].begin(), data[getHashValue(key)].end(), [&](const pair<KEY, VALUE>& p) {return p.first == key; }) != data[getHashValue(key)].end());
 }
 
 template<typename KEY, typename VALUE>
