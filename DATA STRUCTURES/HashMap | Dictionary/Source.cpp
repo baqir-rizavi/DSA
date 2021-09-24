@@ -62,7 +62,7 @@ void HashMap<KEY, VALUE>::resize()
 	HashMap<KEY, VALUE> newMap(size * 2);
 
 	for (int i = 0; i < size; i++)
-		for_each(data[i].begin(), data[i].end(), [&](const pair<KEY, VALUE>& p) { add(p.first, p.second); });
+		for_each(data[i].begin(), data[i].end(), [&](const pair<KEY, VALUE>& p) { newMap.add(p.first, p.second); });
 
 	this->~HashMap();
 	*this = newMap;
