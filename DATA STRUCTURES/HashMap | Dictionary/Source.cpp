@@ -1,7 +1,7 @@
 #include <iostream>
 #include <functional>	// for hash and pair class
 #include <forward_list>	// can use custom made
-#include <algorithm>	// for iterating functions example. "find/find_if/remove_if/copy"
+#include <algorithm>	// for iterating functions example. "find/find_if/remove_if/copy/for_each"
 using namespace std;
 
 /*
